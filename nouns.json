@@ -1,0 +1,44 @@
+[
+  {
+    "name": "first",
+    "endings": [
+      "a",
+      "am",
+      "ae",
+      "ae",
+      "a",
+      "ae",
+      "as",
+      "arum",
+      "is",
+      "is"
+    ]
+  },
+  {
+    "name": "second",
+    "endingsMasculin": [
+      "us",
+      "um",
+      "i",
+      "o",
+      "o",
+      "i",
+      "os",
+      "orum",
+      "is",
+      "is"
+    ],
+    "endingsNueter": [
+      "um",
+      "um",
+      "i",
+      "o",
+      "o",
+      "a",
+      "a",
+      "orum",
+      "is",
+      "is"
+    ]
+  }
+]

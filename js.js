@@ -15,29 +15,28 @@ $(document).ready(function() {
 
 if (annyang) {
 
-  function calcTime(city, offset) {
-  // create Date object for current location
-  var d = new Date();
 
-  // convert to msec
-  // subtract local time zone offset
-  // get UTC time in msec
-  var utc = d.getTime() - (d.getTimezoneOffset() * 60000);
+ function calcTime(timezone, offset) {
+     // create Date object for current location
+     var d = new Date();
 
-  // create new Date object for different city
-  // using supplied offset
-  var nd = new Date(utc + (3600000*offset));
-  console.log(nd.toLocaleString);
-  Speak("It is currently " + nd.toLocaleString + " in " + city);
-  }
+     // convert to msec
+     // subtract local time zone offset
+     // get UTC time in msec
+     var utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+
+     // create new Date object for different timezone
+     // using supplied offset
+     var nd = new Date(utc + (3600000*offset));
+     Speak("It is currently " + getTimeAsString(nd) + " in " + timezone);
+   }
+
+   function getTimeAsString(date) {
+     return date.getHours() + ' ' + date.getMinutes();
+   }
   function Speak(message) {
-    if(responsiveVoice.voiceSupport()) {
       responsiveVoice.speak(message, "UK English Male");
-    } else {
-      console.log("Browser is not supported");
-      $(".hello").text("I cannot read this out to you because your browser does not support this.");
     }
-}
   function thanks() {
     setTimeout(function() {
       annyang.addCommands(giveBack);
@@ -141,24 +140,26 @@ var doLaugh = function() {
   thanks();
 }
 
-var currentTimezone = function(timezone) {
-  $.getJSON("timezones.json", function(data) {
-    console.log(timezone);
-    var found = false;
-    for (var i = 0; i < data.length; i++) {
-      if (data[i].abbr == timezone ) {
-        found = true;
-        console.log("Looking up timezone");
-        calcTime(timezone, data[i].offset);
-      }
-    }
-    if (!found) {
-      console.log("That is not a timezome!");
-      Speak(timezone + " is not a timezone");
-    }
 
-  });
-  thanks();
+var currentTimezone = function(timezone) {
+ $.getJSON("timezones.json", function(data) {
+   console.log(timezone);
+   var found = false;
+   for (var i = 0; i < data.length; i++) {
+     if (data[i].abbr == timezone ) {
+       found = true;
+       console.log("Looking up timezone "+data[i].abbr+" found at index "+i);
+       calcTime(timezone, data[i].offset);
+       break;
+     }
+   }
+   if (!found) {
+     console.log("That is not a timezome!");
+     Speak(timezone + " is not a timezone");
+   }
+
+ });
+ thanks();
 }
 
 
@@ -216,22 +217,24 @@ var setTimer = function(time, unit) {
 }
 
 var checkLessons = function() {
-
-  if (weekday[date.getDay()] == "Saturday") {
+  var d = new Date();
+  var currentDay = weekday[d.getDay()];
+  if (currentDay == "Saturday") {
     Speak("Its Saturday, there is no school today");
   }
-  else if (weekday[date.getDay()] == "Sunday") {
+  else if (currentDay == "Sunday") {
     Speak("There is no school on Sunday, you dimwit");
   } else {
     $.getJSON("lessons.json", function(data) {
-      var today = data.day.weekday[date.getDay()];
+
+      var today = data.day.currentDay;
 
       Speak("Here are your lessons for " + today + " - ");
       for (var i = 0; i < 4; i++) {
         if (!i == 4) {
         Speak(today.lessons[i].subject + " with " + today.lessons[i].teacher + " in " + today.lessons[i].room + " then ");
       } else {
-        Speak( today.lessons[i].subject + " with " + today.lessons[i].teacher + " in " + today.lessons[i].room);
+        Speak(today.lessons[i].subject + " with " + today.lessons[i].teacher + " in " + today.lessons[i].room);
       }
     }
     });
@@ -408,7 +411,7 @@ var openWebsite = function(website) {
 }
 
 var takeAPicture = function() {
-
+   Speak("This feature is not currently working.");
    thanks();
 }
 
@@ -467,10 +470,11 @@ var quoteOfTheDay = function() {
 }
 
 var wordOfTheDay = function() {
-
+  Speak("This feature is currently not available.");
+  thanks();
 }
 var repeatThis = function(repeat) {
-  Speak("Ok. " + repeat);
+  Speak(repeat);
   thanks();
 }
 
@@ -519,6 +523,200 @@ var timeOfDay = function() {
   thanks();
 }
 
+var whoIsKitty = function() {
+  Speak("Kitty - also known as Kitty Jean Prevezer - is a 13 year old school girl studying, she is currently in Year 8.");
+  thanks();
+}
+
+var whoIsFlo = function() {
+  Speak("Flo - also known as Florence Alice Ingelby - is a 13 year old school girl, she is currently in Year 8");
+  thanks();
+}
+
+var whoIsEssie = function() {
+  Speak("Essie - also known as Esther Webb - is a 12 year old school girl, she is currently in year 8");
+  thanks();
+}
+
+var whoIsSuki = function() {
+  Speak("Suki - also known as Suki Griffiths -  is a 13 year old school girl, she is currently in year 8");
+  thanks();
+}
+
+var whoIsScarlett = function() {
+  Speak("Scarlett is a 13 year old school girl, she is currrently in year 8");
+  thanks();
+}
+
+var whoIsKittyB = function() {
+  Speak("Kitty B - also known as Kitty Katherine, is a 12 year old school girl, she is currently in Year 8");
+  thanks();
+}
+
+var loveCalculator = function(name1, name2) {
+  var random = Math.round(Math.random() * (100 - 0) + 0);
+
+  console.log(random);
+  if (random == 100) {
+    Speak("They are a " + random + " percent amazing couple. They will get together very soon or should already be together");
+  }
+  else if (random > 90) {
+    Speak("This is an amazing match." + name1 + " and " + name2 + " could be a couple! Almost will be. Good luck with a score of " + random + " percent");
+  }
+  else if (random > 70) {
+    Speak("Ooh la la. Looks like " + name1 + " and " + name2 + " would be great match with a score of " + random + " percent");
+  }
+  else if (random < 20) {
+    Speak(name1 + " and " + name2 + " would never go together! Euurgh. They have a score of " + random + " percent");
+  }
+  else if (random < 50) {
+    Speak("Meh, I dont think that " + name1 + " and " + name2 + " would be a good match  - with a score of " + random + "percent");
+  }
+  thanks();
+}
+
+var whoIsNatty = function() {
+  Speak("Natty - also known as Nathaniel Abbebe Assafa - is a 12 year old school boy, currently studying for his exams");
+  thanks();
+}
+
+var whoIsMax = function() {
+  Speak("Whos Max - Oh hes really nobody. Only really the smartest bestest person ever.");
+}
+var firstNounEndings = function() {
+  var singEndings = ["a", "am", "i", "i", "a"];
+  var plurEndings = ["i", "as", "arum", "is", "is"];
+
+  Speak("The singular endings for the first declension are - " + singEndings + " and the plural endings are - " + plurEndings);
+  thanks();
+}
+
+var secondMasculineNounEndings = function() {
+  var singEndings = ["us", "um", "i", "o", "o"];
+  var plurEndings = ["i", "os", "orum", "is", "is"];
+
+  Speak("The singular endings for the second declension masculine are - " + singEndings + " and the plural endings are - " + plurEndings);
+  thanks();
+}
+
+var secondNeuterNounEndings = function() {
+  var singEndings = ["um", "um", "i", "o", "o"];
+  var plurEndings = ["a", "a", "arum", "is", "is"];
+
+  Speak("The singular endings for the second declension masculine are - " + singEndings + " and the plural endings are - " + plurEndings);
+  thanks();
+}
+
+var thirdMasculineNounEndings = function() {
+    var singEndings = ["none", "em", "is", "i", "e"];
+    var plurEndings = ["es", "es", "um", "ibus", "ibus"];
+
+    Speak("The singular endings for the third declension masculine are - " + singEndings + " and the plural endings are - " + plurEndings);
+    thanks();
+}
+
+var mostRecentEarthQuake = function() {
+  $.ajax({
+    type: "GET",
+    // Append the word to the url for the API call
+    url: "https://montanaflynn-earthquake-seismology.p.mashape.com/eqs?limit=10&min_magnitude=0'",
+    dataType: 'json',
+    beforeSend: function (xhr) {
+        xhr.setRequestHeader('X-Mashape-Key', 'VcvzGHfd7OmshN6WShvEXZB3BT1Cp17odfXjsnezo6xbGaZ40J');
+    },
+    success: function(data) {
+      Speak("The most recent earthquake was in " + data.earthquakes[0].region + " and had a recorded magnitude of " + data.earthquakes[0].magnitude + " - the date was " + data.earthquakes[0].timedate);
+    },
+    error: function() {
+      console.log("There has been an error");
+      Speak("I could not get the latest Earthquake");
+    },
+  });
+}
+
+var recentEarthquakeAbove = function(magnitude) {
+  $.ajax({
+    type: "GET",
+    // Append the word to the url for the API call
+    url: "https://montanaflynn-earthquake-seismology.p.mashape.com/eqs?limit=10&min_magnitude=" + magnitude,
+    dataType: 'json',
+    beforeSend: function (xhr) {
+        xhr.setRequestHeader('X-Mashape-Key', 'VcvzGHfd7OmshN6WShvEXZB3BT1Cp17odfXjsnezo6xbGaZ40J');
+    },
+    success: function(data) {
+      Speak("The most recent earthquake with a magnitude of " + magnitude + " or above was located in " + data.earthquakes[0].region + " and had a recorded magnitude of " + data.earthquakes[0].magnitude + " at " + data.earthquakes[0].timedate);
+    },
+    error: function() {
+      console.log("There has been an error");
+      Speak("I could not get the latest Earthquake");
+    },
+  });
+}
+
+var recentEarthquakeMagnitude = function(magnitude) {
+  $.ajax({
+    type: "GET",
+    // Append the word to the url for the API call
+    url: "https://montanaflynn-earthquake-seismology.p.mashape.com/eqs?limit=10&min_magnitude='",
+    dataType: 'json',
+    beforeSend: function (xhr) {
+        xhr.setRequestHeader('X-Mashape-Key', 'VcvzGHfd7OmshN6WShvEXZB3BT1Cp17odfXjsnezo6xbGaZ40J');
+    },
+    success: function(data) {
+      Speak("The most recent earthquake was in " + data.earthquakes[0].region + " and had a recorded magnitude of " + data.earthquakes[0].magnitude + " - the date was " + data.earthquakes[0].timedate);
+    },
+    error: function() {
+      console.log("There has been an error");
+      Speak("I could not get the latest Earthquake");
+    },
+  });
+}
+
+// Conversions
+
+var metreToCentimeter = function(num) {
+  console.log(num);
+}
+
+var additionTest = function() {
+  Speak("Ready - Lets go - reply by saying  the answer is whatever the answer is");
+  questions = []
+  answers = []
+
+
+  for (var x = 1; x <= 10; x++) {
+      var random1 =  Math.floor(Math.random() * (10 - 1)) + 1;
+      var random2 =  Math.floor(Math.random() * (10 - 1)) + 1;
+
+      var question = random1 + " + " + random2;
+      var answer = random1 + random2;
+
+      console.log(question);
+      console.log(answer);
+
+      questions.push(question);
+      answers.push(answer);
+  }
+  for (num in questions) {
+    Speak(question[num]);
+    annyang.addCommands(reply);
+    var check = function(answer) {
+      console.log(answer);
+      if (answer == answers[num]) {
+        Speak("Correct.");
+        return;
+      } else {
+
+        Speak("Du Do - Wrong");
+        return;
+      }
+    }
+    var reply = {
+      'The answer = *answer': check
+    }
+  }
+}
+
 var commands = {
   'What day is it (today)': currentDay,
   'What is the short date (today)': shortDate,
@@ -530,6 +728,7 @@ var commands = {
   '(Can you) show me some cute cat gifs': randomCatGif,
   'Show me some cat gifs': randomCatGif,
   'I need cat': randomCatGif,
+  'Give me some cat': randomCatGif,
   'Show some cat pictures': randomCatPicture,
   '(Can you) show me (a) (some) (cute) cat (pictures) (images) (photos) (pics)': randomCatPicture,
   'What time is it in *timezone': currentTimezone,
@@ -555,18 +754,48 @@ var commands = {
   'Take a photo': takeAPicture,
   'Search Wikipedia for *term': searchWikipedia,
   'What is trending right now': trendingNow,
+  'Whats trending': trendingNow,
   'Play some dubstep': playDubstep,
+  'Beatbox for me': playDubstep,
+  'Sing some dubstep': playDubstep,
+  'Sing some dubstpe for me': playDubstep,
   'What is being cool like': beingCool,
   '(what are some) Alternatives to *alternative': alternativesTo,
+  'Show me some alternatives to *alternative': alternativesTo,
   'What is the quote of the day': quoteOfTheDay,
+  'Show me the quote of the day': quoteOfTheDay,
+  'What is the quote of the day today': quoteOfTheDay,
   'Repeat this *repeat': repeatThis,
+  'Can you repeat this *repeat': repeatThis,
   'What is the word of the day': wordOfTheDay,
   'What does *word mean': getDefinition,
   'What is the definition of *word': getDefinition,
   'Define *word': getDefinition,
+  'What is the air like in *place': airQuality,
   'What is the air quality (like) in (the) *place': airQuality,
   'How is the air quality in (the) *place': airQuality,
-  'What time of day is it': timeOfDay
+  'What time of day is it': timeOfDay,
+  'What sort of time (of day) is it': timeOfDay,
+  'Who is Kitty': whoIsKitty,
+  'Who is Flow': whoIsFlo,
+  'Who is Essie ': whoIsEssie,
+  'Who is Scarlett': whoIsScarlett,
+  'Who is Suki': whoIsSuki,
+  'Who is Natty': whoIsNatty,
+  'Who is Max': whoIsMax,
+  'Who is Kitty Katherine': whoIsKittyB,
+  'Wood *name1 and *name2 be a good match': loveCalculator,
+  'Calculate *name1 and *name2 s love status': loveCalculator,
+  'Recite (the) first declension noun endings': firstNounEndings,
+  'Recite (the) second declension masculine noun endings': secondMasculineNounEndings,
+  'Recite (the) second declension neuter noun endings': secondNeuterNounEndings,
+  'Recite (the) third declension masculine noun endings': thirdMasculineNounEndings,
+  'What is the most recent earthquake': mostRecentEarthQuake,
+  'What was the most recent earhtquake': mostRecentEarthQuake,
+  'What was the most recent earthquake with a magnitude above *magnitude': recentEarthquakeAbove,
+  'What was the most recent earthquake with a magnitude of *magnitude': recentEarthquakeMagnitude,
+  'Convert *num meter(s) to centimeters': metreToCentimeter,
+  'Give me an addition test': additionTest
 }
 
 annyang.addCommands({
@@ -588,7 +817,19 @@ annyang.addCommands({
   }, 30000, "linear", function() {
     annyang.removeCommands(commands);
   });
-}});
+},
+'Whats up': function() {
+  console.log("'sup.");
+  Speak("Apart from the ceiling? Nothing much.");
+  $(".jarvis-end").css("width", "0 !important");
+  annyang.addCommands(commands);
+  $(".jarvis-end").animate({
+    width: "100%"
+  }, 30000, "linear", function() {
+    annyang.removeCommands(commands);
+  });
+}
+});
 
 annyang.start();
 }
